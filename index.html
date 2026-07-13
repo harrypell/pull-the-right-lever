@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invite our councillors to look at the evidence — Brighton &amp; Hove school admissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rail: #0e8f8f;        /* Brighton seafront-railing turquoise */
+    --rail-deep: #0a6d6d;
+    --ink: #17313b;
+    --chalk: #fdfdfb;
+    --pebble: #eef3f2;
+    --sand: #e8b04b;
+    --line: #d4dedd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important} }
+  body{
+    font-family:'Public Sans',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--chalk);
+    line-height:1.55;
+    font-size:16px;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 20px}
+
+  header{
+    background:var(--ink);
+    color:var(--chalk);
+    padding:52px 0 44px;
+    border-bottom:6px solid var(--rail);
+  }
+  .eyebrow{
+    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--sand);font-weight:600;margin-bottom:14px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:700;
+    font-size:clamp(30px,6vw,44px);line-height:1.12;
+    margin-bottom:16px;
+  }
+  header p{max-width:56ch;color:#cfdcdb;font-size:17px}
+  header p strong{color:var(--chalk)}
+
+  .step{padding:36px 0 8px}
+  .step-tag{
+    display:inline-block;background:var(--rail);color:#fff;
+    font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+    padding:4px 12px;border-radius:100px;margin-bottom:10px;
+  }
+  h2{font-family:'Fraunces',serif;font-size:24px;margin-bottom:6px}
+  .step > .wrap > p{color:#4a6068;max-width:58ch;margin-bottom:18px}
+
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:540px){.fields{grid-template-columns:1fr}}
+  label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
+  input[type=text]{
+    width:100%;padding:11px 12px;font:inherit;
+    border:1.5px solid var(--line);border-radius:8px;background:#fff;
+  }
+  input[type=text]:focus{outline:2px solid var(--rail);outline-offset:1px;border-color:var(--rail)}
+
+  .recipients{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+  .recipient{
+    display:flex;gap:12px;align-items:flex-start;
+    background:var(--pebble);border:1.5px solid var(--line);
+    border-radius:10px;padding:12px 14px;cursor:pointer;
+  }
+  .recipient:has(input:checked){border-color:var(--rail);background:#eaf5f4}
+  .recipient input{margin-top:4px;width:17px;height:17px;accent-color:var(--rail);flex-shrink:0}
+  .recipient .who{font-weight:600}
+  .recipient .role{font-size:14px;color:#4a6068}
+  .recipient .addr{font-size:13px;color:var(--rail-deep);word-break:break-all}
+
+  .letter-box{
+    background:#fff;border:1.5px solid var(--line);border-radius:12px;
+    box-shadow:0 2px 10px rgba(23,49,59,.06);overflow:hidden;
+  }
+  .letter-box .bar{
+    background:var(--pebble);padding:9px 16px;font-size:13px;
+    color:#4a6068;display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1.5px solid var(--line);
+  }
+  .letter-box .bar button{
+    background:none;border:none;font:inherit;font-weight:600;
+    color:var(--rail-deep);cursor:pointer;text-decoration:underline;
+  }
+  textarea{
+    width:100%;border:none;resize:vertical;
+    padding:18px;font:inherit;font-size:15px;line-height:1.6;
+    min-height:420px;background:#fff;color:var(--ink);
+  }
+  textarea:focus{outline:none;background:#fffdf7}
+  .charcount{font-variant-numeric:tabular-nums}
+  .charcount.warn{color:#b3541e;font-weight:600}
+
+  .send{padding:34px 0 64px}
+  .buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .btn{
+    font:inherit;font-weight:600;font-size:16px;
+    border-radius:10px;padding:14px 22px;cursor:pointer;
+    border:2px solid transparent;
+  }
+  .btn:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+  .btn-primary{background:var(--rail);color:#fff}
+  .btn-primary:hover{background:var(--rail-deep)}
+  .btn-ghost{background:#fff;border-color:var(--rail);color:var(--rail-deep)}
+  .btn-ghost:hover{background:var(--pebble)}
+  .send small{display:block;margin-top:14px;color:#4a6068;max-width:56ch}
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+    background:var(--ink);color:#fff;padding:11px 20px;border-radius:100px;
+    font-weight:600;font-size:14px;opacity:0;transition:all .25s ease;pointer-events:none;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  footer{
+    border-top:1.5px solid var(--line);padding:22px 0 40px;
+    font-size:13.5px;color:#4a6068;
+  }
+  footer a{color:var(--rail-deep)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Brighton &amp; Hove school admissions</div>
+    <h1>Ask our councillors to look at the evidence — it takes 60&nbsp;seconds.</h1>
+    <p>The council will decide this autumn how secondary admissions work from <strong>September 2028</strong>. Professor Adam Dennett (Professor of Urban Analytics, UCL) has independently analysed what's really driving school attainment in our city — and is presenting his findings at a free public lecture, <strong>“How to Pull the Right Lever”</strong>, on <strong>Monday 21&nbsp;July, 7–9pm at BHASVIC</strong> (also joinable via Zoom). Invite the councillors who shape this policy to come and see the data before the next consultation is written.</p>
+  </div>
+</header>
+
+<section class="step">
+  <div class="wrap">
+    <span class="step-tag">Step 1</span>
+    <h2>Your details</h2>
+    <p>These are dropped into the letter automatically. Councillors give far more weight to letters from identifiable local families.</p>
+    <div class="fields">
+      <div>
+        <label for="f-name">Your name</label>
+        <input type="text" id="f-name" placeholder="e.g. Sam Wilson" autocomplete="name">
+      </div>
+      <div>
+        <label for="f-area">Your neighbourhood or ward</label>
+        <input type="text" id="f-area" placeholder="e.g. Fiveways / Preston Park">
+      </div>
+      <div style="grid-column:1/-1">
+        <label for="f-kids">Your children (optional)</label>
+        <input type="text" id="f-kids" placeholder="e.g. two children in Years 4 and 5 at Balfour Primary">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <span class="step-tag">Step 2</span>
+    <h2>Who it goes to</h2>
+    <p>Pre-selected: the three councillors with most influence over admissions policy. Untick any you like.</p>
+    <div class="recipients" id="recipients">
+      <label class="recipient">
+        <input type="checkbox" checked value="jacob.taylor@brighton-hove.gov.uk">
+        <span><span class="who">Cllr Jacob Taylor</span><br>
+        <span class="role">Deputy Leader — has led the admissions changes</span><br>
+        <span class="addr">jacob.taylor@brighton-hove.gov.uk</span></span>
+      </label>
+      <label class="recipient">
+        <input type="checkbox" checked value="emma.daniel@brighton-hove.gov.uk">
+        <span><span class="who">Cllr Emma Daniel</span><br>
+        <span class="role">Cabinet Member for Children, Families &amp; Youth Services</span><br>
+        <span class="addr">emma.daniel@brighton-hove.gov.uk</span></span>
+      </label>
+      <label class="recipient">
+        <input type="checkbox" checked value="bella.sankey@brighton-hove.gov.uk">
+        <span><span class="who">Cllr Bella Sankey</span><br>
+        <span class="role">Leader of the Council</span><br>
+        <span class="addr">bella.sankey@brighton-hove.gov.uk</span></span>
+      </label>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="wrap">
+    <span class="step-tag">Step 3</span>
+    <h2>Your letter</h2>
+    <p>Send it as it is, or make it yours — personal letters carry the most weight. Your details from Step&nbsp;1 appear as you type.</p>
+    <div style="margin-bottom:14px">
+      <label for="f-subject">Subject line</label>
+      <input type="text" id="f-subject">
+    </div>
+    <div class="letter-box">
+      <div class="bar">
+        <span>Editable preview</span>
+        <span><span class="charcount" id="charcount">0</span> characters &nbsp;·&nbsp; <button type="button" id="reset">Reset to template</button></span>
+      </div>
+      <textarea id="letter" aria-label="Letter text"></textarea>
+    </div>
+  </div>
+</section>
+
+<section class="send">
+  <div class="wrap">
+    <span class="step-tag">Step 4</span>
+    <h2>Send it</h2>
+    <div class="buttons">
+      <button class="btn btn-primary" id="send">Open in your email app</button>
+      <button class="btn btn-ghost" id="copyletter">Copy letter</button>
+      <button class="btn btn-ghost" id="copyaddr">Copy email addresses</button>
+    </div>
+    <small>“Open in your email app” pre-fills the recipients, subject and letter — you just press send. If it doesn’t open (some webmail setups), use the copy buttons and paste into a new email.</small>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Organised by local parents. This is a civic action, not affiliated with any political party.
+    Lecture: <a href="https://www.ucl.ac.uk/bartlett/events/2026/jul/public-lecture-how-pull-right-lever" rel="noopener">“How to Pull the Right Lever”</a>, <span id="footer-lecture"></span> — free,
+    <a href="https://www.eventbrite.co.uk/e/public-lecture-how-to-pull-the-right-lever-tickets-1989088812182" rel="noopener">book in person</a> or
+    <a href="https://ucl.zoom.us/webinar/register/WN_Tiri-BsoRJOf9ge8TZ-Isw#/registration" rel="noopener">join via Zoom</a>.
+    Professor Dennett’s published analyses are collected at <a href="https://www.parentsupport.group/" rel="noopener">parentsupport.group</a>.
+    Approach inspired by the <a href="https://smartphonefreechildhood.org" rel="noopener">Smartphone Free Childhood</a> campaign model.
+  </div>
+</footer>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ============================================================
+   EDIT ME — campaign configuration
+   ============================================================ */
+const CONFIG = {
+  subject: "Invitation: 'How to Pull the Right Lever' — evidence on school attainment in Brighton & Hove, Mon 21 July",
+  lecture: {
+    title: "How to Pull the Right Lever",
+    date: "Monday 21 July",
+    time: "7\u20139pm",
+    venue: "Main Hall, BHASVIC, 205 Dyke Road, Hove BN3 6EG",
+    infoUrl: "https://www.ucl.ac.uk/bartlett/events/2026/jul/public-lecture-how-pull-right-lever"
+  }
+};
+
+const TEMPLATE = ({name, area, kids}) => `Dear Councillors,
+
+I am a parent living in ${area}${kids ? ", with " + kids : ""}. I share the council's goals for our schools: closing the attainment gap, improving social mobility, and building a fairer system for every child in Brighton & Hove.
+
+It is because I support those goals that I am writing. Professor Adam Dennett (Professor of Urban Analytics, UCL) has independently analysed Brighton & Hove's schools data, and his published analyses raise serious questions about whether the recent admissions changes will deliver what is intended. His new report finds that, once structural factors are accounted for, our city is already among England's best-performing authorities for attainment of both disadvantaged and non-disadvantaged pupils - and that its deepest problem is attendance, which hits disadvantaged pupils hardest. If so, the most powerful lever for the council's own goals may not be admissions reform at all.
+
+He presents these findings at a free public lecture, "How to Pull the Right Lever", on ${CONFIG.lecture.date}, ${CONFIG.lecture.time}, at BHASVIC, Dyke Road, Hove - also joinable via Zoom. Details and booking: ${CONFIG.lecture.infoUrl}
+
+I would warmly invite you to attend before this autumn's consultation on the 2028-29 admission arrangements is designed. This is not a request to abandon the policy's aims - only that the next step be shaped by the best available evidence.
+
+I would be grateful for a reply confirming whether you or a colleague will attend.
+
+Yours sincerely,
+${name}
+${area}, Brighton & Hove`;
+
+/* ============================================================ */
+const $ = id => document.getElementById(id);
+const fields = {name: $("f-name"), area: $("f-area"), kids: $("f-kids")};
+const letter = $("letter");
+let userEdited = false;
+
+function values(){
+  return {
+    name: fields.name.value.trim() || "[Your name]",
+    area: fields.area.value.trim() || "[your neighbourhood]",
+    kids: fields.kids.value.trim()
+  };
+}
+function render(){
+  if (!userEdited) letter.value = TEMPLATE(values());
+  count();
+}
+function count(){
+  const n = letter.value.length;
+  const el = $("charcount");
+  el.textContent = n.toLocaleString();
+  el.classList.toggle("warn", n > 1800);
+}
+Object.values(fields).forEach(f => f.addEventListener("input", render));
+letter.addEventListener("input", () => { userEdited = true; count(); });
+$("reset").addEventListener("click", () => { userEdited = false; render(); });
+
+function selectedEmails(){
+  return [...document.querySelectorAll("#recipients input:checked")].map(c => c.value);
+}
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
+}
+$("send").addEventListener("click", () => {
+  const to = selectedEmails();
+  if (!to.length){ toast("Choose at least one councillor"); return; }
+  const url = "mailto:" + to.join(",") +
+    "?subject=" + encodeURIComponent($("f-subject").value || CONFIG.subject) +
+    "&body=" + encodeURIComponent(letter.value);
+  window.location.href = url;
+});
+async function copy(text, msg){
+  try { await navigator.clipboard.writeText(text); toast(msg); }
+  catch { toast("Copy failed — select and copy manually"); }
+}
+$("copyletter").addEventListener("click", () => copy(letter.value, "Letter copied"));
+$("copyaddr").addEventListener("click", () => {
+  const to = selectedEmails();
+  if (!to.length){ toast("Choose at least one councillor"); return; }
+  copy(to.join(", "), "Addresses copied");
+});
+
+$("f-subject").value = CONFIG.subject;
+$("footer-lecture").textContent =
+  `${CONFIG.lecture.date}, ${CONFIG.lecture.time}, ${CONFIG.lecture.venue}`;
+render();
+</script>
+</body>
+</html>
