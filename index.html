@@ -59,11 +59,11 @@
   .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:540px){.fields{grid-template-columns:1fr}}
   label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
-  input[type=text]{
+  input[type=text], select{
     width:100%;padding:11px 12px;font:inherit;
     border:1.5px solid var(--line);border-radius:8px;background:#fff;
   }
-  input[type=text]:focus{outline:2px solid var(--rail);outline-offset:1px;border-color:var(--rail)}
+  input[type=text]:focus, select:focus{outline:2px solid var(--rail);outline-offset:1px;border-color:var(--rail)}
 
   .recipients{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
   .recipient{
@@ -154,6 +154,12 @@
         <label for="f-kids">Your children (optional)</label>
         <input type="text" id="f-kids" placeholder="e.g. two children in Years 4 and 5 at Balfour Primary">
       </div>
+      <div style="grid-column:1/-1">
+        <label for="f-ward">Your council ward (optional — adds your own local councillors to the letter)</label>
+        <select id="f-ward">
+          <option value="">Not sure / skip</option>
+        </select>
+      </div>
     </div>
   </div>
 </section>
@@ -162,7 +168,7 @@
   <div class="wrap">
     <span class="step-tag">Step 2</span>
     <h2>Who it goes to</h2>
-    <p>Pre-selected: the three councillors with most influence over admissions policy. Untick any you like.</p>
+    <p>Pre-selected: the four councillors with most influence over admissions policy. Pick your ward in Step&nbsp;1 to add your own local councillors too.</p>
     <div class="recipients" id="recipients">
       <label class="recipient">
         <input type="checkbox" checked value="jacob.taylor@brighton-hove.gov.uk">
@@ -177,10 +183,22 @@
         <span class="addr">emma.daniel@brighton-hove.gov.uk</span></span>
       </label>
       <label class="recipient">
+        <input type="checkbox" checked value="ty.goddard@brighton-hove.gov.uk">
+        <span><span class="who">Cllr Ty Goddard</span><br>
+        <span class="role">Children, Families &amp; Schools Committee — former head of education services, Lambeth</span><br>
+        <span class="addr">ty.goddard@brighton-hove.gov.uk</span></span>
+      </label>
+      <label class="recipient">
         <input type="checkbox" checked value="bella.sankey@brighton-hove.gov.uk">
         <span><span class="who">Cllr Bella Sankey</span><br>
         <span class="role">Leader of the Council</span><br>
         <span class="addr">bella.sankey@brighton-hove.gov.uk</span></span>
+      </label>
+      <label class="recipient" id="ward-card" style="display:none">
+        <input type="checkbox" checked id="ward-check">
+        <span><span class="who" id="ward-names">Your ward councillors</span><br>
+        <span class="role" id="ward-role"></span><br>
+        <span class="addr" id="ward-addrs"></span></span>
       </label>
     </div>
   </div>
@@ -263,7 +281,54 @@ ${name}
 ${area}, Brighton & Hove`;
 
 /* ============================================================ */
+/* ============================================================ */
 const $ = id => document.getElementById(id);
+
+/* Ward councillors (source: Brighton & Hove City Council, July 2026) */
+const WARDS = {
+  "Brunswick & Adelaide": [["Andrei Czolak","Andrei.Czolak@brighton-hove.gov.uk"],["Ollie Sykes","Ollie.Sykes@brighton-hove.gov.uk"]],
+  "Central Hove": [["Emma Daniel","Emma.Daniel@brighton-hove.gov.uk"],["Joy Robinson","Joy.Robinson@brighton-hove.gov.uk"]],
+  "Coldean & Stanmer": [["Mitchie Alexander","Mitchie.Alexander@brighton-hove.gov.uk"],["Tobias Sheard","Tobias.Sheard@brighton-hove.gov.uk"]],
+  "Goldsmid": [["Birgit Miller","Birgit.Miller@brighton-hove.gov.uk"],["Jackie O'Quinn","Jackie.o'quinn@brighton-hove.gov.uk"],["Nadia Barton Ahmad","Nadia.BartonAhmad@brighton-hove.gov.uk"],["Trevor Muten","Trevor.Muten@brighton-hove.gov.uk"]],
+  "Hangleton & Knoll": [["Amanda Grimshaw","Amanda.Grimshaw@brighton-hove.gov.uk"],["Faiza Baghoth","Faiza.Baghoth@brighton-hove.gov.uk"],["John Hewitt","John.Hewitt@brighton-hove.gov.uk"]],
+  "Hanover & Elm Grove": [["Maureen Winder","Maureen.Winder@brighton-hove.gov.uk"],["Tim Rowkins","Tim.Rowkins@brighton-hove.gov.uk"],["Ty Galvin","Ty.Galvin@brighton-hove.gov.uk"]],
+  "Hollingdean & Fiveways": [["Bruno De Oliveira","Bruno.DeOliveira@brighton-hove.gov.uk"],["Mohammed Asaduzzaman","Mohammed.Asaduzzaman@brighton-hove.gov.uk"],["Theresa Fowler","Theresa.Fowler@brighton-hove.gov.uk"]],
+  "Kemptown": [["Gary Wilkinson","Gary.Wilkinson@brighton-hove.gov.uk"],["Theresa Mackey","theresa.mackey@brighton-hove.gov.uk"]],
+  "Moulsecoomb & Bevendean": [["Amanda Evans","Amanda.Evans@brighton-hove.gov.uk"],["Jacob Taylor","Jacob.Taylor@brighton-hove.gov.uk"],["Ty Goddard","Ty.Goddard@brighton-hove.gov.uk"]],
+  "North Portslade": [["Lucy Helliwell","Lucy.Helliwell@brighton-hove.gov.uk"],["Peter Atkinson","peter.atkinson@brighton-hove.gov.uk"]],
+  "Patcham & Hollingbury": [["Alistair McNair","Alistair.McNair@brighton-hove.gov.uk"],["Anne Meadows","anne.meadows@brighton-hove.gov.uk"],["Carol Theobald","carol.theobald@brighton-hove.gov.uk"]],
+  "Preston Park": [["Kerry Pickett","Kerry.Pickett@brighton-hove.gov.uk"],["Liz Loughran","Liz.Loughran@brighton-hove.gov.uk"],["Steve Davis","steve.davis@brighton-hove.gov.uk"]],
+  "Queen's Park": [["Marina Lademacher","Marina.Lademacher@brighton-hove.gov.uk"],["Milla Gauge","Milla.Gauge@brighton-hove.gov.uk"]],
+  "Regency": [["Alison Thomson","Alison.Thomson@brighton-hove.gov.uk"],["Chloe Goldsmith","Chloe.Goldsmith@brighton-hove.gov.uk"]],
+  "Rottingdean & West Saltdean": [["Bridget Fishleigh","Bridget.Fishleigh@brighton-hove.gov.uk"],["Mark Earthey","Mark.Earthey@brighton-hove.gov.uk"]],
+  "Round Hill": [["Pete West","pete.west@brighton-hove.gov.uk"],["Raphael Hill","Raphael.Hill@brighton-hove.gov.uk"]],
+  "South Portslade": [["Alan Robins","alan.robins@brighton-hove.gov.uk"],["Josh Guilmant","josh.guilmant@brighton-hove.gov.uk"]],
+  "West Hill & North Laine": [["Ellen McLeay","Ellen.Mcleay@brighton-hove.gov.uk"],["Sue Shanks","Susan.Shanks@brighton-hove.gov.uk"]],
+  "Westbourne & Poets' Corner": [["Julie Cattell","Julie.A.Cattell@brighton-hove.gov.uk"],["Sam Parrott","sam.parrott@brighton-hove.gov.uk"]],
+  "Westdene & Hove Park": [["Emma Hogan","Emma.Hogan@brighton-hove.gov.uk"],["Ivan Lyons","Ivan.Lyons@brighton-hove.gov.uk"],["Samer Bagaeen","Samer.Bagaeen@brighton-hove.gov.uk"]],
+  "Whitehawk & Marina": [["David McGregor","David.McGregor@brighton-hove.gov.uk"],["Gill Williams","Gilliane.Williams@brighton-hove.gov.uk"]],
+  "Wish": [["Bella Sankey","Bella.Sankey@brighton-hove.gov.uk"],["Paul Nann","Paul.Nann@brighton-hove.gov.uk"]],
+  "Woodingdean": [["Jacob Allen","Jacob.Allen@brighton-hove.gov.uk"],["Jacqui Simon","Jacqui.Simon@brighton-hove.gov.uk"]]
+};
+
+const wardSelect = $("f-ward");
+Object.keys(WARDS).forEach(w => {
+  const o = document.createElement("option");
+  o.value = w; o.textContent = w;
+  wardSelect.appendChild(o);
+});
+wardSelect.addEventListener("change", () => {
+  const w = wardSelect.value;
+  const card = $("ward-card");
+  if (!w){ card.style.display = "none"; render(); return; }
+  const members = WARDS[w];
+  $("ward-names").textContent = members.map(m => "Cllr " + m[0]).join(", ");
+  $("ward-role").textContent = "Your ward councillors — " + w;
+  $("ward-addrs").textContent = members.map(m => m[1].toLowerCase()).join(", ");
+  card.style.display = "flex";
+  render();
+});
+
 const fields = {name: $("f-name"), area: $("f-area"), kids: $("f-kids")};
 const letter = $("letter");
 let userEdited = false;
@@ -271,7 +336,7 @@ let userEdited = false;
 function values(){
   return {
     name: fields.name.value.trim() || "[Your name]",
-    area: fields.area.value.trim() || "[your neighbourhood]",
+    area: fields.area.value.trim() || wardSelect.value || "[your neighbourhood]",
     kids: fields.kids.value.trim()
   };
 }
@@ -290,7 +355,15 @@ letter.addEventListener("input", () => { userEdited = true; count(); });
 $("reset").addEventListener("click", () => { userEdited = false; render(); });
 
 function selectedEmails(){
-  return [...document.querySelectorAll("#recipients input:checked")].map(c => c.value);
+  const set = new Set(
+    [...document.querySelectorAll("#recipients input:checked")]
+      .filter(c => c.value.includes("@"))
+      .map(c => c.value.toLowerCase())
+  );
+  if (wardSelect.value && $("ward-card").style.display !== "none" && $("ward-check").checked){
+    WARDS[wardSelect.value].forEach(m => set.add(m[1].toLowerCase()));
+  }
+  return [...set];
 }
 function toast(msg){
   const t = $("toast");
