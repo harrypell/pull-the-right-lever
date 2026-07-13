@@ -301,9 +301,12 @@ function toast(msg){
 $("send").addEventListener("click", () => {
   const to = selectedEmails();
   if (!to.length){ toast("Choose at least one councillor"); return; }
+  // RFC 6068: line breaks in mailto bodies must be CRLF, or mobile
+  // mail apps (iOS Mail, Gmail) collapse the paragraphs.
+  const body = letter.value.replace(/\r?\n/g, "\r\n");
   const url = "mailto:" + to.join(",") +
     "?subject=" + encodeURIComponent($("f-subject").value || CONFIG.subject) +
-    "&body=" + encodeURIComponent(letter.value);
+    "&body=" + encodeURIComponent(body);
   window.location.href = url;
 });
 async function copy(text, msg){
